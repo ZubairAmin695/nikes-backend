@@ -4,7 +4,7 @@ const mongoose = require("mongoose")
 
 mongoose
   .connect(
-    "mongodb+srv://Mohiodin:mohiodin@cluster0.sossjpd.mongodb.net/express-auth"
+    "mongodb://localhost:27017/nikes"
   )
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.log(err.message))
