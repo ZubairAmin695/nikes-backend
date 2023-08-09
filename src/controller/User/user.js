@@ -95,7 +95,7 @@ exports.signup = async (req, res) => {
         </head>
         <body>
           <div class="container">
-            <h1>Hello</h1><span class="user">${user.full_name}</span>
+            <h1>Hello</h1><span class="user">${full_name}</span>
             <h2>Use This To Login</h2>
             <p>Your One-Time Password (OTP) is: <span class="otp">${otp}</span></p>
           </div>
