@@ -42,6 +42,69 @@ exports.signup = async (req, res) => {
     const wallet = await createWallet();
     console.log(wallet);
 
+    // generate 6 digit otp and send to user email
+
+    var otp = Math.floor(100000 + Math.random() * 900000);
+
+    // write email body here html and css design
+
+    var subject = "One Time Password (OTP)";
+    var email_body = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Reset Password</title>
+          <style>
+            body {
+              margin: 0;
+              padding: 0;
+              font-family: Arial, sans-serif;
+              background-color: #f2f2f2;
+            }
+            .container {
+              max-width: 500px;
+              margin: 0 auto;
+              padding: 20px;
+              border-radius: 10px;
+              background-color: white;
+              box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            h1 {
+              text-align: center;
+              color: #ff4d4d;
+            }
+            h2 {
+              text-align: center;
+              color: #ff4d4d;
+              margin-top: 10px;
+            }
+            p {
+              text-align: center;
+              margin-top: 20px;
+            }
+            .otp {
+              font-weight: bold;
+              color: #ff4d4d;
+              font-size: 18px;
+            }
+            .user{
+                font-weight: bold;
+                font-size: 20px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>Hello</h1><span class="user">${user.full_name}</span>
+            <h2>Use This To Login</h2>
+            <p>Your One-Time Password (OTP) is: <span class="otp">${otp}</span></p>
+          </div>
+        </body>
+        </html>
+        `;
+
+    await sendEmail(email, subject, email_body, full_name);
+
     // create new user
     var user = new User({
       full_name,
@@ -50,6 +113,7 @@ exports.signup = async (req, res) => {
       walletAddress: wallet.address ? wallet.address : {},
       privateKey: wallet.privateKey ? wallet.privateKey : "",
       publicKey: wallet.address.base58 ? wallet.address.base58 : "",
+      login_otp: otp,
     });
 
     // save user to database
@@ -78,7 +142,7 @@ exports.signup = async (req, res) => {
       .status(200)
       .json({
         code: 200,
-        message: "Signup successful",
+        message: "Please Check your Email for Account Activation",
       });
   } catch (error) {
     console.log(error);
@@ -109,6 +173,13 @@ exports.login = async (req, res) => {
       return res.status(400).json({
         code: 400,
         message: "Invalid credentials",
+      });
+    }
+
+    if (user.is_verified == false) {
+      return res.status(400).json({
+        code: 400,
+        message: "Please Activate Your Account First",
       });
     }
 
@@ -386,6 +457,7 @@ exports.verifyOtpForLogin = async (req, res) => {
     );
 
     user.login_otp = 0;
+    user.is_verified = true;
     await user.save();
 
     return res.status(200).json({
