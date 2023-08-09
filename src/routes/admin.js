@@ -9,11 +9,13 @@ const {
   approveWithdraw,
   dashboard,
   is_withdraw,
+  getBalance,
 } = require("../controller/admin/admin");
 router.post("/login", admin_login);
 router.post("/userList", admin_auth, userList);
 router.post("/approveWithdraw", admin_auth, approveWithdraw);
 router.post("/dashboard", admin_auth, dashboard);
 router.post("/is_withdraw", admin_auth, is_withdraw);
+router.post("/getBalance", admin_auth, getBalance);
 
 module.exports = router;

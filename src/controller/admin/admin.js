@@ -186,3 +186,18 @@ exports.is_withdraw = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+exports.getBalance = async (req, res) => {
+  try {
+    var balance = await getBalance(req.body.publicKey);
+
+    return res.status(200).json({
+      code: 200,
+      message: "Balance fetched successfully",
+      balance: balance,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
