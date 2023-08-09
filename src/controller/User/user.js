@@ -440,6 +440,8 @@ exports.verifyOtpForLogin = async (req, res) => {
       });
     }
 
+    console.log(user);
+
     if (user.login_otp.toString() !== otp.toString()) {
       return res.status(400).json({
         code: 400,
