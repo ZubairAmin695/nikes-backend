@@ -113,10 +113,11 @@ exports.signup = async (req, res) => {
       walletAddress: wallet.address ? wallet.address : {},
       privateKey: wallet.privateKey ? wallet.privateKey : "",
       publicKey: wallet.address.base58 ? wallet.address.base58 : "",
-      login_otp: otp,
     });
 
     // save user to database
+    user = await user.save();
+    user.login_otp = otp;
     user = await user.save();
     if (!!referral_of) {
       user.referral_of = referral_of;
