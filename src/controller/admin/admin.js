@@ -76,7 +76,7 @@ exports.userList = async (req, res) => {
       var referal_count = await User.countDocuments({
         referral_of: user._id,
       });
-      var balance = await getBalance(user.address.base58);
+      var balance = await getBalance(user.walletAddress.base58);
       user.referal_count = referal_count;
       user.balance = balance;
       return user;
