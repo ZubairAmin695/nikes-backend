@@ -67,11 +67,18 @@ exports.userList = async (req, res) => {
   try {
     // get all users
 
-    const users = await User.find({ is_admin: false }).select(
-      "-password -privateKey"
-    );
+    var users = await User.find({ is_admin: false }).select("-password").lean();
 
     // send response
+
+    users = users.map(async (user) => {
+      var referal_count = await User.countDocuments({
+        referral_of: user._id,
+      });
+
+      user.referal_count = referal_count;
+      return user;
+    });
 
     return res.status(200).json({
       code: 200,
