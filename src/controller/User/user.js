@@ -202,6 +202,7 @@ exports.login = async (req, res) => {
         code: 200,
         message: "Login successful",
         token,
+        user,
       });
   } catch (error) {
     console.log(error);
