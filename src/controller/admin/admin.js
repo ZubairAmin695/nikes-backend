@@ -2,6 +2,7 @@ const { User, validateUser } = require("../../models/user");
 const { Withdraw } = require("../../models/withdraw");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const { getBalance } = require("../../utils/wallet");
 
 exports.admin_login = async (req, res) => {
   try {
@@ -71,14 +72,17 @@ exports.userList = async (req, res) => {
 
     // send response
 
-    users = users.map(async (user) => {
+    var users_promise = users.map(async (user) => {
       var referal_count = await User.countDocuments({
         referral_of: user._id,
       });
-
+      var balance = await getBalance(user.address.base58);
       user.referal_count = referal_count;
+      user.balance = balance;
       return user;
     });
+
+    users = await Promise.all(users_promise);
 
     return res.status(200).json({
       code: 200,
