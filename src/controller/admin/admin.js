@@ -56,6 +56,7 @@ exports.admin_login = async (req, res) => {
       code: 200,
       message: "Login successful",
       token: token,
+      user: user,
     });
   } catch (error) {
     console.log(error);
