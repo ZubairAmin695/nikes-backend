@@ -114,7 +114,11 @@ const UPDATE_USER_COMMISSION = async () => {
       // check if user balance is greater than 0 and last closing balance is less than user balance then add commission
 
       var current_user_deposit = user_balance - last_closing_balance;
-      if (current_user_deposit > 0) {
+      if (
+        (current_user_deposit > 0 && current_user_deposit == 30) ||
+        current_user_deposit == 50 ||
+        current_user_deposit == 100
+      ) {
         // get  10% of user deposit as commission
         var commission = (current_user_deposit * 10) / 100;
 
