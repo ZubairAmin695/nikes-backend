@@ -3,6 +3,7 @@ const { Withdraw } = require("../../models/withdraw");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { getBalance } = require("../../utils/wallet");
+const { Redeem } = require("../../models/redeem");
 
 exports.admin_login = async (req, res) => {
   try {
@@ -195,6 +196,48 @@ exports.getBalance = async (req, res) => {
       code: 200,
       message: "Balance fetched successfully",
       balance: balance,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports.list_redeem = async (req, res) => {
+  try {
+    const redeems = await Redeem.find({}).populate("user").lean();
+
+    return res.status(200).json({
+      code: 200,
+      message: "Success",
+      redeems: redeems,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports.approve_redeem = async (req, res) => {
+  try {
+    const { redeem_id, request_status } = req.body;
+
+    const redeem = await Redeem.findById(redeem_id);
+
+    if (!redeem) {
+      return res.status(400).json({
+        code: 400,
+        message: "Redeem does not exist",
+      });
+    }
+
+    redeem.request_status = req.body.request_status;
+    await redeem.save();
+
+    return res.status(200).json({
+      code: 200,
+      message: "Redeem status updated successfully",
+      redeem: redeem,
     });
   } catch (error) {
     console.log(error);

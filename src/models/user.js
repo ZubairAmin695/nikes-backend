@@ -58,9 +58,18 @@ const userSchema = new mongoose.Schema(
       default: 0,
     },
 
+    referral_commission: {
+      type: Number,
+      default: 0,
+    },
     is_verified: {
       type: Boolean,
       default: false,
+    },
+
+    last_closing_balance: {
+      type: Number,
+      default: 0,
     },
   },
   {

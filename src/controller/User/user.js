@@ -1,5 +1,6 @@
 const { User, validateUser } = require("../../models/user");
 const jwt = require("jsonwebtoken");
+const { Redeem } = require("../../models/redeem");
 const bcrypt = require("bcrypt");
 const {
   SEND_EMAIL,
@@ -122,6 +123,16 @@ exports.signup = async (req, res) => {
     if (!!referral_of) {
       user.referral_of = referral_of;
       await user.save();
+
+      // find the user who referred this user and add 5 to his comission
+
+      var referal_user = await User.findById(referral_of);
+      if (referal_user) {
+        referal_user.referral_commission += 5;
+        await referal_user.save();
+      } else {
+        console.log("No user found");
+      }
     }
     const token = jwt.sign(
       {
@@ -545,6 +556,18 @@ exports.withdraw_balance = async (req, res) => {
     user.product_commission = 0;
     await user.save();
 
+    var data = {
+      user: user,
+      amount: req.body.amount,
+      address: req.body.address,
+    };
+
+    var io = global.io;
+    let result = io.in("admin_room").emit("withdraw_reciever", {
+      data: data,
+    });
+    console.log(result);
+
     return res.status(200).json({
       code: 200,
       message: "Withdraw successful",
@@ -723,6 +746,62 @@ exports.customerSupport = async (req, res) => {
     return res
       .status(200)
       .json({ code: 200, message: "Mail sent successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports.redeem_points = async (req, res) => {
+  try {
+    const { amount } = req.body;
+
+    var user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(400).json({
+        code: 400,
+        message: "User does not exist",
+      });
+    }
+
+    if (referral_commission.toString() < amount.toString()) {
+      return res.status(400).json({
+        code: 400,
+        message: "You dont have enough points",
+      });
+    }
+    user.referral_commission -= amount;
+    await user.save();
+
+    var redeem = new Redeem({
+      user: user._id,
+      amount,
+    });
+
+    await redeem.save();
+
+    return res.status(200).json({
+      code: 200,
+      message: "Redeem successful - wait for admin approval",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports.my_redemtion = async (req, res) => {
+  try {
+    var user = await User.findById(req.user._id);
+
+    var redemptions = await Redeem.find({ user: user._id });
+
+    return res.status(200).json({
+      code: 200,
+      message: "Successfully Fetched",
+      redemptions,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal Server Error" });

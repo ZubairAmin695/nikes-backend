@@ -85,8 +85,68 @@ const sendEmail = async (receiver, subject, email_body) => {
   } catch (error) {}
 };
 
+const { User, validateUser } = require("../models/user");
+const {
+  setupTron,
+  createWallet,
+  getBalance,
+  withdraw,
+  sendTrx,
+} = require("./wallet");
+const UPDATE_USER_COMMISSION = async () => {
+  try {
+    // var balance = await getBalance(address.base58);
+
+    var user_list = await User.find({
+      is_admin: false,
+    });
+
+    for (let i = 0; i < user_list.length; i++) {
+      var current_user = user_list[i];
+      var user_commission = current_user.product_commission;
+
+      var last_closing_balance = current_user.last_closing_balance;
+      var users_address = current_user.publicKey;
+      // get users balance from blockchain
+      var user_balance = await getBalance(users_address);
+      if (!user_balance) continue;
+
+      // check if user balance is greater than 0 and last closing balance is less than user balance then add commission
+
+      var current_user_deposit = user_balance - last_closing_balance;
+      if (current_user_deposit > 0) {
+        // get  10% of user deposit as commission
+        var commission = (current_user_deposit * 10) / 100;
+
+        // update user balanc
+        current_user.last_closing_balance = user_balance;
+        current_user.product_commission = user_commission + commission;
+
+        // find  referrer of current user and update his commission
+
+        await current_user.save();
+
+        // find referrer of current user
+
+        if (!!current_user.referral_of) {
+          var referrer = await User.findOne({
+            _id: current_user.referral_of,
+          });
+          if (!!referrer) {
+            var referrer_commission = referrer.referral_commission;
+            referrer.referral_commission = referrer_commission + commission;
+            await referrer.save();
+          }
+        }
+      }
+    }
+    console.log("User Commission Updated");
+  } catch (error) {}
+};
+
 module.exports = {
   SEND_EMAIL,
   SEND_EMAIL_SEND_BLUE,
   sendEmail,
+  UPDATE_USER_COMMISSION,
 };

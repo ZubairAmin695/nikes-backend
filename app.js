@@ -7,12 +7,14 @@ var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var logger = require("morgan");
 const cors = require("cors");
+const cron = require("node-cron");
 const session = require("express-session");
 // const MongoStore = require("connect-mongo")(session);
 
 // var indexRouter = require('./routes/index');
 var usersRouter = require("./src/routes/users");
 var adminRouter = require("./src/routes/admin");
+const { UPDATE_USER_COMMISSION } = require("./src/utils/utils");
 
 var app = express();
 
@@ -59,6 +61,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 // app.use(bodyParser.json({ limit: "50mb" }));
 app.use(express.static(path.join(__dirname, "public")));
+
+// run a cron job every 12 AM each day to update the user's wallet
+
+cron.schedule("0 0 * * *", () => {
+  console.log("running a task every day");
+  UPDATE_USER_COMMISSION();
+});
 
 app.get("/", (req, res) => {
   res.render("index", { title: "Crypto Vaulet" });
