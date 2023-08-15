@@ -776,7 +776,7 @@ module.exports.redeem_points = async (req, res) => {
 
     var redeem = new Redeem({
       user: user._id,
-      amount,
+      points: amount,
     });
 
     await redeem.save();

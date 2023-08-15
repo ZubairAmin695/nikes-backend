@@ -232,6 +232,21 @@ module.exports.approve_redeem = async (req, res) => {
     }
 
     redeem.request_status = req.body.request_status;
+
+    if (request_status == "rejected") {
+      // foind user and add balance
+
+      var user = await User.findById(redeem.user);
+      if (!user) {
+        return res.status(400).json({
+          code: 400,
+          message: "User does not exist",
+        });
+      } else {
+        user.referral_commission += redeem.points;
+        await user.save();
+      }
+    }
     await redeem.save();
 
     return res.status(200).json({
