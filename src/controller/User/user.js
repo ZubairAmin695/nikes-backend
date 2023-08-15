@@ -530,6 +530,13 @@ exports.withdraw_balance = async (req, res) => {
       });
     }
 
+    if (!withdraw_avail.is_approved && !user.is_withdraw) {
+      return res.status(400).json({
+        code: 400,
+        message: "Withdraw is Not Availble yet",
+      });
+    }
+
     var data = {
       user: user,
       amount: req.body.amount,
@@ -553,12 +560,6 @@ exports.withdraw_balance = async (req, res) => {
     // check if withdrw is open
 
     var withdraw_avail = await Withdraw.findOne();
-    if (!withdraw_avail.is_approved) {
-      return res.status(400).json({
-        code: 400,
-        message: "Withdraw is Not Availble yet",
-      });
-    }
 
     var address = user.walletAddress;
     var private_key = user.privateKey;
