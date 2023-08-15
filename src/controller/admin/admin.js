@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { getBalance } = require("../../utils/wallet");
 const { Redeem } = require("../../models/redeem");
+const { Notification } = require("../../models/notification");
 
 exports.admin_login = async (req, res) => {
   try {
@@ -254,6 +255,21 @@ module.exports.approve_redeem = async (req, res) => {
       code: 200,
       message: "Redeem status updated successfully",
       redeem: redeem,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports.list_notification = async (req, res) => {
+  try {
+    var notifications = await Notification.find({}).populate("user").lean();
+
+    return res.status(200).json({
+      code: 200,
+      message: "Success",
+      notifications: notifications,
     });
   } catch (error) {
     console.log(error);

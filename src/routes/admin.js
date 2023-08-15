@@ -12,6 +12,7 @@ const {
   getBalance,
   list_redeem,
   approve_redeem,
+  list_notification,
 } = require("../controller/admin/admin");
 router.post("/login", admin_login);
 router.post("/userList", admin_auth, userList);
@@ -21,5 +22,6 @@ router.post("/is_withdraw", admin_auth, is_withdraw);
 router.post("/getBalance", admin_auth, getBalance);
 router.post("/list_redeem", admin_auth, list_redeem);
 router.post("/approve_redeem", admin_auth, approve_redeem);
+router.get("/list_notification", admin_auth, list_notification);
 
 module.exports = router;

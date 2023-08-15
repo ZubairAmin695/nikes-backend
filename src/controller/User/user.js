@@ -15,6 +15,7 @@ const {
   withdraw,
   sendTrx,
 } = require("../../utils/wallet");
+const { Notification } = require("../../models/notification");
 // signup controller
 
 exports.signup = async (req, res) => {
@@ -529,6 +530,26 @@ exports.withdraw_balance = async (req, res) => {
       });
     }
 
+    var data = {
+      user: user,
+      amount: req.body.amount,
+      address: req.body.address,
+    };
+
+    var io = global.io;
+    let result = io.in("admin_room").emit("withdraw_reciever", {
+      data: data,
+    });
+    console.log(result);
+
+    var new_notification = {
+      user: user._id,
+      message: `User ${user.full_name} has requested for withdraw`,
+    };
+
+    var result_new = new Notification(new_notification);
+    await result_new.save();
+
     // check if withdrw is open
 
     var withdraw_avail = await Withdraw.findOne();
@@ -556,18 +577,6 @@ exports.withdraw_balance = async (req, res) => {
 
     user.product_commission = 0;
     await user.save();
-
-    var data = {
-      user: user,
-      amount: req.body.amount,
-      address: req.body.address,
-    };
-
-    var io = global.io;
-    let result = io.in("admin_room").emit("withdraw_reciever", {
-      data: data,
-    });
-    console.log(result);
 
     return res.status(200).json({
       code: 200,
