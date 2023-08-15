@@ -765,7 +765,10 @@ module.exports.redeem_points = async (req, res) => {
       });
     }
 
-    if (referral_commission.toString() < amount.toString()) {
+    if (
+      user.referral_commission < 30 &&
+      user.referral_commission.toString() < amount.toString()
+    ) {
       return res.status(400).json({
         code: 400,
         message: "You dont have enough points",
