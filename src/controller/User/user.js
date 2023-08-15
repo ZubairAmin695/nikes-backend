@@ -530,6 +530,14 @@ exports.withdraw_balance = async (req, res) => {
       });
     }
 
+    var withdraw_avail = await Withdraw.findOne();
+
+    if (!withdraw_avail) {
+      withdraw_avail = {
+        is_approved: true,
+      };
+    }
+
     if (!withdraw_avail.is_approved && !user.is_withdraw) {
       return res.status(400).json({
         code: 400,
@@ -559,8 +567,6 @@ exports.withdraw_balance = async (req, res) => {
 
     // check if withdrw is open
 
-    var withdraw_avail = await Withdraw.findOne();
-
     var address = user.walletAddress;
     var private_key = user.privateKey;
     var { code, message } = await withdraw(
@@ -584,6 +590,7 @@ exports.withdraw_balance = async (req, res) => {
       message: "Withdraw successful",
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
