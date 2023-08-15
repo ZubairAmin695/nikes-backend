@@ -508,7 +508,7 @@ exports.getBalance = async (req, res) => {
       code: 200,
       message: "Balance fetched successfully",
       balance: balance,
-      product_comission:product_comission
+      product_comission: product_comission,
     });
   } catch (error) {
     console.log(error);
@@ -767,8 +767,8 @@ module.exports.redeem_points = async (req, res) => {
     }
 
     if (
-      user.referral_commission < 30 &&
-      user.referral_commission.toString() < amount.toString()
+      user.product_commission < 30 &&
+      user.product_commission.toString() < amount.toString()
     ) {
       return res.status(400).json({
         code: 400,
