@@ -508,6 +508,7 @@ exports.getBalance = async (req, res) => {
       code: 200,
       message: "Balance fetched successfully",
       balance: balance + product_comission,
+      referral_commission: user.referral_commission,
     });
   } catch (error) {
     console.log(error);
