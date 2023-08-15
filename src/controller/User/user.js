@@ -507,7 +507,7 @@ exports.getBalance = async (req, res) => {
     return res.status(200).json({
       code: 200,
       message: "Balance fetched successfully",
-      balance: balance + product_comission,
+      balance: balance,
       product_comission: user.product_comission,
     });
   } catch (error) {
