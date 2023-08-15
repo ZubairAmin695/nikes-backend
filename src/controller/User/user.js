@@ -775,7 +775,7 @@ module.exports.redeem_points = async (req, res) => {
         message: "You dont have enough points",
       });
     }
-    user.referral_commission -= amount;
+    user.product_commission -= amount;
     await user.save();
 
     var redeem = new Redeem({

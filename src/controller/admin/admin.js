@@ -243,7 +243,7 @@ module.exports.approve_redeem = async (req, res) => {
           message: "User does not exist",
         });
       } else {
-        user.referral_commission += redeem.points;
+        user.product_commission += redeem.points;
         await user.save();
       }
     }

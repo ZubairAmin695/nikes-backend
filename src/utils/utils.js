@@ -137,8 +137,8 @@ const UPDATE_USER_COMMISSION = async () => {
             _id: current_user.referral_of,
           });
           if (!!referrer) {
-            var referrer_commission = referrer.product_comission;
-            referrer.product_comission = referrer_commission + commission;
+            var referrer_commission = referrer.product_commission;
+            referrer.product_commission = referrer_commission + commission;
             await referrer.save();
           }
         }
